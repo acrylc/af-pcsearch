@@ -35,6 +35,7 @@ $iconWhiteSpritePath: "../images/glyphicons-halflings-white.png";
 
 #narrative{
 	z-index:3;
-	position:relative;
-
+	position: absolute;
+	bottom: 50px;
+	font-size:2em;
 }

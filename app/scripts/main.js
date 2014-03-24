@@ -61,8 +61,6 @@ App = {
 
 		_renderDestination: function(point, address){
 			L.marker([point.lat, point.lon]).addTo(this.map);
-			$('#narrative').html('The closes polling stations is here, at: '+address.name + ' , ' +address.location);
-			$('#narrative').html('The closes polling stations is here, at: '+address.name + ' , ' +address.location);
 
 
 			var distance = function (lat1, lon1, lat2, lon2, unit) {
@@ -83,9 +81,13 @@ App = {
 
 			var dist = (distance(App.home.lat, App.home.lon, point.lat, point.lon, 'K')).toFixed(2);
 
-			$('#narrative').html('You are: '+dist + ' km away.' );
+			$('#narrative').html('The closes polling stations is here, at: '+address.name + ' , ' +address.location + 
+				'You are: '+dist + ' km away.' );
 
 			
+			var group = new L.featureGroup([L.marker([App.home.lat,App.home.lon]), L.marker([point.lat,point.lon])]);
+			this.map.fitBounds(group.getBounds());
+
 
 		},
 

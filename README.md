@@ -1,8 +1,8 @@
-af-pcsearch
+Polling Station Search for Afghanistan
 ===========
 
-Install dependencies: npm install && bower install
+Install dependencies: `npm install && bower install`
 
-Server: grunt server
+Test Server: `grunt server`
 
-Build: grunt build
+Build: `grunt build`

@@ -21,14 +21,14 @@ App = {
 			var that = this;
 			// display map
 			var baseMap = 'mayakreidieh.hk09m36l';
-			this.map = L.mapbox.map('map', baseMap);
+			this.map = L.mapbox.map('map', baseMap).setView([34.361370, 66.363099], 6);
 
 			// listen to control input
 			$('#manual-map').on('click', function(){
 				console.log('clicked manual');
 				that.initUserLocationEntry();
 				$('#control').fadeOut(100);	
-				$('#districts').fadeIn(100);	
+				$('.select-style').fadeIn(100);	
 			});
 			$('#auto-map').on('click', function(){
 				console.log('clicked autp');

@@ -197,7 +197,7 @@ App = {
 
 			var that = this;
 			var distNames = {};
-			var districts = omnivore.topojson('/data/districts.json')
+			var districts = omnivore.topojson('data/districts.json')
 			.on('ready', function() {
 
 				for (var key in districts._layers) {

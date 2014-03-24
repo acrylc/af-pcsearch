@@ -20,7 +20,7 @@ App = {
 			
 			var that = this;
 			// display map
-			var baseMap = 'mayakreidieh.hj5c0hl9';
+			var baseMap = 'mayakreidieh.hk09m36l';
 			this.map = L.mapbox.map('map', baseMap);
 
 			// listen to control input
@@ -62,7 +62,7 @@ App = {
 		_renderDestination: function(point, address){
 			L.marker([point.lat, point.lon]).addTo(this.map);
 
-
+			// from : http://www.geodatasource.com/developers/javascript
 			var distance = function (lat1, lon1, lat2, lon2, unit) {
 				var radlat1 = Math.PI * lat1/180;
 				var radlat2 = Math.PI * lat2/180;
@@ -84,7 +84,6 @@ App = {
 			$('#narrative').html('The closes polling stations is here, at: '+address.name + ' , ' +address.location + 
 				'You are: '+dist + ' km away.' );
 
-			
 			var group = new L.featureGroup([L.marker([App.home.lat,App.home.lon]), L.marker([point.lat,point.lon])]);
 			this.map.fitBounds(group.getBounds());
 

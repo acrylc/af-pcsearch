@@ -54,6 +54,41 @@ App = {
 			this.map.fitBounds(polyline.getBounds());
 		}, 
 
+		_renderHome : function(point){
+			L.marker([point.lat, point.lon]).addTo(this.map);
+			// $('#narrative').html('You are here.');
+		},
+
+		_renderDestination: function(point, address){
+			L.marker([point.lat, point.lon]).addTo(this.map);
+			$('#narrative').html('The closes polling stations is here, at: '+address.name + ' , ' +address.location);
+			$('#narrative').html('The closes polling stations is here, at: '+address.name + ' , ' +address.location);
+
+
+			var distance = function (lat1, lon1, lat2, lon2, unit) {
+				var radlat1 = Math.PI * lat1/180;
+				var radlat2 = Math.PI * lat2/180;
+				var radlon1 = Math.PI * lon1/180;
+				var radlon2 = Math.PI * lon2/180;
+				var theta = lon1-lon2;
+				var radtheta = Math.PI * theta/180;
+				var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+				dist = Math.acos(dist);
+				dist = dist * 180/Math.PI;
+				dist = dist * 60 * 1.1515;
+				if (unit=="K") { dist = dist * 1.609344 }
+				if (unit=="N") { dist = dist * 0.8684 }
+				return dist;
+			};
+
+			var dist = (distance(App.home.lat, App.home.lon, point.lat, point.lon, 'K')).toFixed(2);
+
+			$('#narrative').html('You are: '+dist + ' km away.' );
+
+			
+
+		},
+
 		getUserGeoLocation : function(){
 
 			var that = this;
@@ -65,7 +100,7 @@ App = {
 						lon :  position.coords.longitude
 					};
 					console.log('getting getClosesPollingStation');
-					that.addHome(App.home);
+					that._renderHome(App.home);
 					that.getClosestPollingStation();
 			    });
 				return true;
@@ -153,7 +188,7 @@ App = {
 			var nearestPC = {'lon':App.pollingStations[minIndex][12], 'lat':App.pollingStations[minIndex][13]};
 			console.log('NEAREST PC');
 			console.log(nearestPC);
-			App.Map.addPoint(nearestPC);
+			this._renderDestination(nearestPC, {'name' : App.pollingStations[minIndex][6] , 'location' : App.pollingStations[minIndex][5] });
 			return minIndex;
 		},
 

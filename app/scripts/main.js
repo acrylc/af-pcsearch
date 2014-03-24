@@ -157,7 +157,7 @@ App = {
 
 			$.ajax({
 				type: "GET",
-				url: "data.csv",
+				url: "data/data.csv",
 				dataType: "text",
 				success: function(data) {processData(data);}
 			});
@@ -197,7 +197,7 @@ App = {
 
 			var that = this;
 			var distNames = {};
-			var districts = omnivore.topojson('/scripts/districts.json')
+			var districts = omnivore.topojson('data/districts.json')
 			.on('ready', function() {
 
 				for (var key in districts._layers) {

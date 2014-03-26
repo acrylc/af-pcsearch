@@ -22,21 +22,36 @@ App = {
 			// display map
 			var baseMap = 'mayakreidieh.hk09m36l';
 			this.map = L.mapbox.map('map', baseMap).setView([34.361370, 66.363099], 6);
+							this.map.on('dragend', function(e) {
+					console.log(e);
+					App.home = {
+						lat: that.map.getCenter().lat,
+						lon: that.map.getCenter().lng,
+					};
+					that._renderHome(App.home);
+					that.getClosestPollingStation();
+				});
 
 			// listen to control input
 			$('#manual-map').on('click', function(){
+				$('#title').html('');
 				console.log('clicked manual');
 				that.initUserLocationEntry();
+
 				$('#control').fadeOut(100);	
-				$('.select-style').fadeIn(100);	
+				$('.select-style').fadeIn(100);
 			});
 			$('#auto-map').on('click', function(){
+								$('#title').html('');
+
 				console.log('clicked autp');
 				that.getUserGeoLocation();
 				$('#control').fadeOut(100);
 
 			});
 			$('#view-map').on('click', function(){
+								$('#title').html('');
+
 				console.log('clicked view');
 			});
 		},
@@ -55,12 +70,23 @@ App = {
 		}, 
 
 		_renderHome : function(point){
-			L.marker([point.lat, point.lon]).addTo(this.map);
+			if (!this.homeMarker) {
+				this.homeMarker = L.marker([point.lat, point.lon]).addTo(this.map);
+			} else {
+				console.log('hello')
+				this.homeMarker.setLatLng([point.lat, point.lon]).update();
+			}
 			// $('#narrative').html('You are here.');
 		},
 
 		_renderDestination: function(point, address){
-			L.marker([point.lat, point.lon]).addTo(this.map);
+			if (!this.distanceMarker) {
+				this.distanceMarker = L.marker([point.lat, point.lon]).addTo(this.map);
+			} else {
+				console.log(this.distanceMarker);
+				this.distanceMarker.setLatLng([point.lat, point.lon]).update();
+				console.log(this.distanceMarker);
+			}
 
 			// from : http://www.geodatasource.com/developers/javascript
 			var distance = function (lat1, lon1, lat2, lon2, unit) {
@@ -75,17 +101,17 @@ App = {
 				dist = dist * 180/Math.PI;
 				dist = dist * 60 * 1.1515;
 				if (unit=="K") { dist = dist * 1.609344 }
-				if (unit=="N") { dist = dist * 0.8684 }
-				return dist;
-			};
+					if (unit=="N") { dist = dist * 0.8684 }
+						return dist;
+				};
 
-			var dist = (distance(App.home.lat, App.home.lon, point.lat, point.lon, 'K')).toFixed(2);
+				var dist = (distance(App.home.lat, App.home.lon, point.lat, point.lon, 'K')).toFixed(2);
 
-			$('#narrative').html('The closes polling stations is here, at: '+address.name + ' , ' +address.location + 
-				'You are: '+dist + ' km away.' );
+				$('#narrative').html('The closest polling station is here, at: '+address.name + ' , ' +address.location + 
+					'You are: '+dist + ' km away.' );
 
-			var group = new L.featureGroup([L.marker([App.home.lat,App.home.lon]), L.marker([point.lat,point.lon])]);
-			this.map.fitBounds(group.getBounds());
+			// var group = new L.featureGroup([L.marker([App.home.lat,App.home.lon]), L.marker([point.lat,point.lon])]);
+			// this.map.fitBounds(group.getBounds());
 
 
 		},
@@ -95,7 +121,7 @@ App = {
 			var that = this;
 			if (navigator.geolocation) {
 				// console.log(navigator.geolocation.getCurrentPosition())
-			    navigator.geolocation.getCurrentPosition(function(position){
+				navigator.geolocation.getCurrentPosition(function(position){
 					App.home = {
 						lat : position.coords.latitude,
 						lon :  position.coords.longitude
@@ -103,7 +129,7 @@ App = {
 					console.log('getting getClosesPollingStation');
 					that._renderHome(App.home);
 					that.getClosestPollingStation();
-			    });
+				});
 				return true;
 			} else {
 				console.log('none');
@@ -138,88 +164,98 @@ App = {
 						(strMatchedDelimiter != strDelimiter)
 						){
 						arrData.push( [] );
-					}
-					if (arrMatches[ 2 ]){
-						var strMatchedValue = arrMatches[ 2 ].replace(
-							new RegExp( "\"\"", "g" ),
-							"\""
-							);
-
-					} else {
-						var strMatchedValue = arrMatches[ 3 ];
-					}
-					arrData[ arrData.length - 1 ].push( strMatchedValue );
 				}
-				App.pollingStations= arrData;
-				console.log( arrData.length );
-				that.getNearestNeighbor();
+				if (arrMatches[ 2 ]){
+					var strMatchedValue = arrMatches[ 2 ].replace(
+						new RegExp( "\"\"", "g" ),
+						"\""
+						);
+
+				} else {
+					var strMatchedValue = arrMatches[ 3 ];
+				}
+				arrData[ arrData.length - 1 ].push( strMatchedValue );
 			}
+			App.pollingStations= arrData;
+			console.log( arrData.length );
+			that.getNearestNeighbor();
+		}
 
-			$.ajax({
-				type: "GET",
-				url: "data/data.csv",
-				dataType: "text",
-				success: function(data) {processData(data);}
-			});
-		},
+		$.ajax({
+			type: "GET",
+			url: "data/data.csv",
+			dataType: "text",
+			success: function(data) {processData(data);}
+		});
+	},
 
-		getNearestNeighbor : function(){
+	getNearestNeighbor : function(){
 
-			var min = Infinity,
-				minIndex = 0;
+		var min = Infinity,
+		minIndex = 0;
 
-			var lineDistance = function ( point1, point2 ) {
-				var xs = 0,
-					ys = 0;
-				xs = point2.x - point1.x;
-				xs = xs * xs;
-				ys = point2.y - point1.y;
-				ys = ys * ys;
-				return Math.sqrt( xs + ys );
+		var lineDistance = function ( point1, point2 ) {
+			var xs = 0,
+			ys = 0;
+			xs = point2.x - point1.x;
+			xs = xs * xs;
+			ys = point2.y - point1.y;
+			ys = ys * ys;
+			return Math.sqrt( xs + ys );
+		};
+		for (var i = 1; i<App.pollingStations.length;i++){
+			var p1 = {'x':App.home.lat, 'y':App.home.lon};
+			var p2 = {'x':App.pollingStations[i][13], 'y':App.pollingStations[i][12]};
+			var len = lineDistance(p1,p2);
+			if (len < min){
+				min = len;
+				minIndex = i;
+			}
+		}
+		var nearestPC = {'lon':App.pollingStations[minIndex][12], 'lat':App.pollingStations[minIndex][13]};
+		console.log('NEAREST PC');
+		console.log(nearestPC);
+		this._renderDestination(nearestPC, {'name' : App.pollingStations[minIndex][6] , 'location' : App.pollingStations[minIndex][5] });
+		return minIndex;
+	},
+
+	initUserLocationEntry : function(){
+
+		var that = this;
+		var distNames = {};
+		var districts = omnivore.topojson('data/districts.json')
+		.on('ready', function() {
+
+			for (var key in districts._layers) {
+				distNames[districts._layers[key].feature.properties.dist_name] = districts._layers[key];
 			};
-			for (var i = 1; i<App.pollingStations.length;i++){
-				var p1 = {'x':App.home.lat, 'y':App.home.lon};
-				var p2 = {'x':App.pollingStations[i][13], 'y':App.pollingStations[i][12]};
-				var len = lineDistance(p1,p2);
-				if (len < min){
-					min = len;
-					minIndex = i;
-				}
-			}
-			var nearestPC = {'lon':App.pollingStations[minIndex][12], 'lat':App.pollingStations[minIndex][13]};
-			console.log('NEAREST PC');
-			console.log(nearestPC);
-			this._renderDestination(nearestPC, {'name' : App.pollingStations[minIndex][6] , 'location' : App.pollingStations[minIndex][5] });
-			return minIndex;
-		},
 
-		initUserLocationEntry : function(){
+			var distOptions = $('#districts');
 
-			var that = this;
-			var distNames = {};
-			var districts = omnivore.topojson('data/districts.json')
-			.on('ready', function() {
+			$.each(distNames, function(name) {
+				console.log(name);
+				distOptions.append($('<option />').val(name).text(name));
+			});
+			distOptions.change(function() {
+				var district = $('select option:selected').val();
+				that.map.fitBounds(distNames[district]);
+				that.map.on('zoomend', function() {
+					console.log('zoomed in')
+					App.home = {
+						lat: that.map.getCenter().lat,
+						lon: that.map.getCenter().lng,
+					};
+					that._renderHome(App.home);
+					that.getClosestPollingStation();
+				})
 
-				for (var key in districts._layers) {
-					distNames[districts._layers[key].feature.properties.dist_name] = districts._layers[key];
-				};
-				
-				var distOptions = $('#districts');
+			});
+		}).addTo(that.map);
 
-				$.each(distNames, function(name) {
-					console.log(name);
-					distOptions.append($('<option />').val(name).text(name));
-				});
-				distOptions.change(function() {
-					var district = $('select option:selected').val();
-					that.map.fitBounds(distNames[district]);
-				});
-			}).addTo(that.map);
+	},
+};
 
-		},
-	};
-
-	App.Map.init();
+App.Map.init();
 
 
 }());

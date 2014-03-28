@@ -8,6 +8,12 @@ $color1: rgb(147,107,232);
 $color2: rgb(127,111,225);
 $color3: rgb(90,103,232);
 
+path {
+  fill: #000;
+  fill-opacity: 0;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
 .hero-unit {
     margin: 50px auto 0 auto;
     width: 300px;

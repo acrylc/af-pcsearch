@@ -27,11 +27,11 @@
         </div>
         <div id='map'></div>
         <!-- <div id='map-overlay'></div> -->
-
+        <a href="#/" id='back-button'><p>Home</p></a>
         <div id='control'>
-            <button id='manual-map'>Select<br>location</button>
-            <button id='auto-map'>Auto<br>geolocation</button>
-            <button id='view-map'>View map</button>
+            <a href="#/manual-map" id='manual-map'>Select<br>location</a>
+            <a href="#/auto-map" id='auto-map'>Auto<br>geolocation</a>
+            <a href="#/view-map" id='view-map'>View map</a>
         </div>
 
         <label id='narrative'></label>
@@ -54,6 +54,7 @@
         <!-- build:js scripts/vendor.js -->
         <!-- bower:js -->
         <script src="bower_components/jquery/jquery.js"></script>
+        <script src="bower_components/director/build/director.min.js"></script>
         <!-- endbower -->
         <!-- endbuild -->
 

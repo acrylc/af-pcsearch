@@ -11,9 +11,8 @@ App = {
 
 	'use strict';
 
-
 	// Initalizes a map of Afghanistan, adds home
-	// and othe icons
+	// and other icons
 	App.Map = {
 
 		init: function(){
@@ -22,44 +21,54 @@ App = {
 			// display map
 			var baseMap = 'mayakreidieh.hk09m36l';
 			this.map = L.mapbox.map('map', baseMap).setView([34.361370, 66.363099], 6);
-							this.map.on('dragend', function(e) {
-					console.log(e);
-					App.home = {
-						lat: that.map.getCenter().lat,
-						lon: that.map.getCenter().lng,
-					};
-					that._renderHome(App.home);
-					that.getClosestPollingStation();
-				});
 
 			// listen to control input
 			$('#manual-map').on('click', function(){
 				$('#title').html('');
-				console.log('clicked manual');
 				that.initUserLocationEntry();
 
-				$('#control').fadeOut(100);	
-				$('#title').fadeOut(100);	
-				$('.select-style').fadeIn(100);	
+				$('#control').fadeOut(100);
+				$('#title').fadeOut(100);
+				$('.select-style').fadeIn(100);
+				that._addDrag();
 			});
 			$('#auto-map').on('click', function(){
-								$('#title').html('');
+				$('#title').html('');
 
-				console.log('clicked autp');
 				that.getUserGeoLocation();
 				$('#title').fadeOut(100);
 				$('#control').fadeOut(100);
+				that._addDrag();
+
 			});
 			$('#view-map').on('click', function(){
-								$('#title').html('');
+				$('#title').html('');
 
-				console.log('clicked view');
 				$('#title').fadeOut(100);
+				$('#control').fadeOut(100);
+				var locations = omnivore.geojson('data/locations.geojson')
+				.on('ready', function(layer) {
+					this.eachLayer(function(marker) {
+						marker.setIcon(L.divIcon({className: 'div-icon'}));
+					});
+				}).addTo(that.map);
 			});
 		},
 
 		addHome: function(point){
 			L.marker([point.lat, point.lon]).addTo(this.map);
+		},
+
+		_addDrag: function () {
+			var that = this;
+			this.map.on('dragend', function(e) {
+				App.home = {
+					lat: that.map.getCenter().lat,
+					lon: that.map.getCenter().lng,
+				};
+				that._renderHome(App.home);
+				that.getClosestPollingStation();
+			});
 		},
 
 		addPoint: function(point){
@@ -75,7 +84,6 @@ App = {
 			if (!this.homeMarker) {
 				this.homeMarker = L.marker([point.lat, point.lon]).addTo(this.map);
 			} else {
-				console.log('hello')
 				this.homeMarker.setLatLng([point.lat, point.lon]).update();
 			}
 			// $('#narrative').html('You are here.');

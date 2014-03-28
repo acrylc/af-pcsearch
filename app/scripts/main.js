@@ -37,16 +37,21 @@ App = {
 
 			}
 			function clear() {
-				// if (that.homeMarker !== undefined) {
-				// 	that.map.removeLayer(that.homeMarker);
-				// }
-				// if (that.distanceMarker !== undefined){
-				// 	that.map.removeLayer(that.distanceMarker);
-				// }
+				if (that.homeMarker !== undefined) {
+					var temp = that.homeMarker;
+					that.map.removeLayer(temp);
+					that.homeMarker = null;
+				}
+				if (that.distanceMarker !== undefined){
+					var temp = that.distanceMarker;
+					that.map.removeLayer(temp);
+					that.distanceMarker = null;
+				}
+				that.map.off('moveend');
+				that.map.off('dragend');
 				that.layers.forEach(function (layer) {
 					that.map.removeLayer(layer);
 				});
-				that._removeDrag();
 			}
 
 			// listen to control input
@@ -78,13 +83,20 @@ App = {
 
 				$('#title').fadeOut(100);
 				$('#control').fadeOut(100);
-				var locations = omnivore.geojson('data/locations.geojson')
-				.on('ready', function(layer) {
-					this.eachLayer(function(marker) {
-						marker.setIcon(L.divIcon({className: 'div-icon'}));
-					});
-				}).addTo(that.map);
+				// var locations = omnivore.geojson('data/locations.geojson')
+				// .on('ready', function(layer) {
+				// 	this.eachLayer(function(marker) {
+				// 		marker.setIcon(L.divIcon({className: 'div-icon'}));
+				// 	});
+				// }).addTo(that.map);
+				var locations = L.mapbox.tileLayer('kamicut.af-pc').addTo(that.map);
+				var gridLayer = L.mapbox.gridLayer('kamicut.af-pc').addTo(that.map);
+				var myGridControl = L.mapbox.gridControl(gridLayer).addTo(that.map);
+				console.log(gridLayer);
 				that.layers.push(locations);
+				that.layers.push(gridLayer);
+				that.layers.push(myGridControl);
+
 				$('#back-button').fadeIn(100);
 				that.view = 'all';
 			};
@@ -106,6 +118,9 @@ App = {
 
 		_addDrag: function () {
 			var that = this;
+			this.map.on('dragstart', function(e) {
+				that.view = 'manual';
+			})
 			this.map.on('dragend', function(e) {
 				App.home = {
 					lat: that.map.getCenter().lat,
@@ -114,9 +129,6 @@ App = {
 				that._renderHome(App.home);
 				that.getClosestPollingStation();
 			});
-		},
-		_removeDrag: function() {
-			this.map.off('dragend');
 		},
 
 		addPoint: function(point){
@@ -274,6 +286,9 @@ App = {
 		var group = this._renderDestination(nearestPC, {
 			'name' : App.pollingStations[minIndex][6] , 'location' : App.pollingStations[minIndex][5] 
 		});
+		if (this.view == 'auto') {
+			this.map.fitBounds(group.getBounds());
+		}
 		return minIndex;
 	},
 

@@ -28,16 +28,18 @@ App = {
 				console.log('clicked manual');
 				that.initUserLocationEntry();
 				$('#control').fadeOut(100);	
+				$('#title').fadeOut(100);	
 				$('.select-style').fadeIn(100);	
 			});
 			$('#auto-map').on('click', function(){
 				console.log('clicked autp');
 				that.getUserGeoLocation();
+				$('#title').fadeOut(100);
 				$('#control').fadeOut(100);
-
 			});
 			$('#view-map').on('click', function(){
 				console.log('clicked view');
+				$('#title').fadeOut(100);
 			});
 		},
 

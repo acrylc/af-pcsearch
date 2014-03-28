@@ -37,6 +37,12 @@ App = {
 
 			}
 			function clear() {
+
+				that.map.off('moveend');
+				that.map.off('dragend');
+				that.layers.forEach(function (layer) {
+					that.map.removeLayer(layer);
+				});
 				if (that.homeMarker !== undefined) {
 					var temp = that.homeMarker;
 					that.map.removeLayer(temp);
@@ -47,11 +53,6 @@ App = {
 					that.map.removeLayer(temp);
 					that.distanceMarker = null;
 				}
-				that.map.off('moveend');
-				that.map.off('dragend');
-				that.layers.forEach(function (layer) {
-					that.map.removeLayer(layer);
-				});
 			}
 
 			// listen to control input
@@ -95,7 +96,7 @@ App = {
 				console.log(gridLayer);
 				that.layers.push(locations);
 				that.layers.push(gridLayer);
-				that.layers.push(myGridControl);
+				//that.layers.push(myGridControl);
 
 				$('#back-button').fadeIn(100);
 				that.view = 'all';

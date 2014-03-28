@@ -149,6 +149,15 @@ font-family: 'Montserrat', sans-serif;
 	width:100%;
 }
 
+@media only screen and (max-width: 480px) {
+  #title {
+    font-size: 2.5em;
+  }
+  #control {
+  	font-size: 0.8em;
+  }
+}
+
 .select-style {
 	width:70%;
 	height:60px;

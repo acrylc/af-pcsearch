@@ -297,7 +297,7 @@ App = {
 			distOptions.change(function() {
 				var district = $('select option:selected').val();
 				that.map.fitBounds(distNames[district]);
-				that.map.on('zoomend', function() {
+				that.map.on('moveend', function() {
 					console.log('zoomed in')
 					App.home = {
 						lat: that.map.getCenter().lat,
